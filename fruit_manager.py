@@ -41,7 +41,8 @@ def afficher_inventaire(inventaire):
 
 def recolter(inventaire, fruit, quantite):
     inventaire[fruit] = inventaire.get(fruit, 0) + quantite
-    print(f"\n✅ Récolté {quantite} {fruit} supplémentaires !")
+    # print(f"\n✅ Récolté {quantite} {fruit} supplémentaires !")
+    return inventaire
 
 
 def vendre(inventaire, fruit, quantite, tresorerie, prix):
