@@ -104,6 +104,11 @@ def valeur_stock(inventaire, prix):
         valeur[fruit] = quantite * prix_unitaire
     return valeur
 
+def dollar_to_euro(tresorerie):
+    taux_de_change = 0.86
+    tresorerie_euro = tresorerie * taux_de_change
+    return tresorerie_euro
+
 
 if __name__ == "__main__":
     inventaire = ouvrir_inventaire()
