@@ -1,5 +1,6 @@
 import streamlit as st
 from fruit_manager import *
+import matplotlib.pyplot as plt
 
 st.title("🍇 Dashboard de la Plantation")
 
@@ -27,7 +28,17 @@ st.header("💰 Trésorerie")
 st.metric(label="Montant disponible", value=f"{tresorerie:.2f} $")
 
 st.header("📦 Inventaire")
+# Inventaire sous forme de tableau
 st.table(inventaire)
+# Inventraire sous forme de graphique
+fig, ax = plt.subplots()
+# Trier l'inventaire par quantité décroissante
+inventaire = dict(sorted(inventaire.items(), key=lambda item: item[1], reverse=True))
+ax.bar(inventaire.keys(), inventaire.values())
+ax.set_xlabel("Fruit")
+ax.set_ylabel("Quantité")
+ax.set_title("Inventaire")
+st.pyplot(fig)
 
 
 ecrire_inventaire(inventaire)
