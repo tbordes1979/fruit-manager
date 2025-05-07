@@ -71,18 +71,19 @@ def afficher_inventaire(inventaire):
 
 def recolter(inventaire, fruit, quantite):
     inventaire[fruit] = inventaire.get(fruit, 0) + quantite
-    # print(f"\n✅ Récolté {quantite} {fruit} supplémentaires !")
-    return inventaire
+    message = {'status': 'success', 'text': f"\nRécolté {quantite} {fruit} supplémentaires !"}
+    return (inventaire, message)
 
 
 def vendre(inventaire, fruit, quantite, tresorerie, prix):
     if inventaire.get(fruit, 0) >= quantite:
         inventaire[fruit] -= quantite
         tresorerie += prix.get(fruit, 0) * quantite
-        print(f"\n💰 Vendu {quantite} {fruit} !")
-        return (inventaire, tresorerie)
+        message = {'status': 'success', 'text': f"\nVendu {quantite} {fruit} !"}
+        return (inventaire, tresorerie, message)
     else:
-        print(f"\n❌ Pas assez de {fruit} pour vendre {quantite} unités.")
+        message = {'status': 'error', 'text': f"\nPas assez de {fruit} pour en vendre {quantite}."}
+        return (inventaire, tresorerie, message)
 
 
 def vendre_tout(inventaire, tresorerie, prix):
