@@ -82,7 +82,7 @@ def vendre(inventaire, fruit, quantite, tresorerie, prix):
         print(f"\n💰 Vendu {quantite} {fruit} !")
         return (inventaire, tresorerie)
     else:
-        print(f"\n❌ Pas assez de {fruit} pour vendre {quantite} unités.")
+        return (inventaire, tresorerie)
 
 
 def vendre_tout(inventaire, tresorerie, prix):
