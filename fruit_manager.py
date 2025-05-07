@@ -1,11 +1,33 @@
 import json
 import os
-
+import datetime
 
 DATA_DIR = "data"
 PRIX_PATH = os.path.join(DATA_DIR, "prix.json")
 INVENTAIRE_PATH = os.path.join(DATA_DIR, "inventaire.json")
 TRESORERIE_PATH = os.path.join(DATA_DIR, "tresorerie.txt")
+
+
+def enregistrer_tresorerie_historique(tresorerie, fichier="data/tresorerie_history.json"):
+    historique = []
+    if os.path.exists(fichier):
+        with open(fichier, "r") as f:
+            try:
+                historique = json.load(f)
+            except:
+                historique = []
+    historique.append({"timestamp": datetime.datetime.now().isoformat(), "tresorerie": tresorerie})
+    with open(fichier, "w") as f:
+        json.dump(historique, f)
+
+def lire_tresorerie_historique(fichier="data/tresorerie_history.json"):
+    if os.path.exists(fichier):
+        with open(fichier, "r") as f:
+            try:
+                return json.load(f)
+            except:
+                return []
+    return []
 
 
 def ouvrir_prix(path=PRIX_PATH):
@@ -79,6 +101,7 @@ def vendre(inventaire, fruit, quantite, tresorerie, prix):
     if inventaire.get(fruit, 0) >= quantite:
         inventaire[fruit] -= quantite
         tresorerie += prix.get(fruit, 0) * quantite
+        enregistrer_tresorerie_historique(tresorerie)
         message = {'status': 'success', 'text': f"\nVendu {quantite} {fruit} !"}
         return (inventaire, tresorerie, message)
     else:
