@@ -16,7 +16,7 @@ def enregistrer_tresorerie_historique(tresorerie, fichier="data/tresorerie_histo
                 historique = json.load(f)
             except:
                 historique = []
-    historique.append({"timestamp": datetime.now().isoformat(), "tresorerie": tresorerie})
+    historique.append({"timestamp": datetime.datetime.now().isoformat(), "tresorerie": tresorerie})
     with open(fichier, "w") as f:
         json.dump(historique, f)
 
@@ -101,11 +101,9 @@ def vendre(inventaire, fruit, quantite, tresorerie, prix):
     if inventaire.get(fruit, 0) >= quantite:
         inventaire[fruit] -= quantite
         tresorerie += prix.get(fruit, 0) * quantite
+        enregistrer_tresorerie_historique(tresorerie)
         message = {'status': 'success', 'text': f"\nVendu {quantite} {fruit} !"}
         return (inventaire, tresorerie, message)
-        enregistrer_tresorerie_historique(tresorerie)
-        print(f"\n💰 Vendu {quantite} {fruit} !")
-        return (inventaire, tresorerie)
     else:
         message = {'status': 'error', 'text': f"\nPas assez de {fruit} pour en vendre {quantite}."}
         return (inventaire, tresorerie, message)
