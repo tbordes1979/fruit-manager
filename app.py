@@ -34,7 +34,7 @@ st.table(inventaire)
 fig, ax = plt.subplots()
 # Trier l'inventaire par quantité décroissante
 inventaire = dict(sorted(inventaire.items(), key=lambda item: item[1], reverse=True))
-ax.bar(inventaire.keys(), inventaire.values())
+ax.bar(inventaire.keys(), inventaire.values(), edgecolor='k')
 ax.set_xlabel("Fruit")
 ax.set_ylabel("Quantité")
 ax.set_title("Inventaire")
