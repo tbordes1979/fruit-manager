@@ -7,6 +7,69 @@ import matplotlib.dates as mdates
 import pandas as pd
 
 
+# 🔁 Mapping description météo → emoji
+emoji_mapping = {
+    "Ciel clair": "☀️",
+    "Peu nuageux": "🌤️",
+    "Ciel voilé": "🌥️",
+    "Nuageux": "☁️",
+    "Très nuageux": "☁️",
+    "Couvert": "☁️",
+    "Brume": "🌫️",
+    "Brouillard": "🌫️",
+    "Pluie faible": "🌦️",
+    "Pluie modérée": "🌧️",
+    "Pluie forte": "🌧️",
+    "Averses de pluie": "🌧️",
+    "Orages": "⛈️",
+    "Orage fort": "⛈️",
+    "Neige": "❄️",
+    "Averses de neige": "🌨️",
+    "Pluie et neige mêlées": "🌨️",
+    "Grêle": "🌩️",
+}
+
+# Client météo
+client = MeteoFranceClient()
+places = client.search_places("Eysines")
+place = places[0]
+forecast = client.get_forecast(place.latitude, place.longitude, language="fr")
+tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+
+# Recherche de la météo de demain
+st.title("🌤️ Météo de demain à Eysines")
+
+trouve = False
+for day in forecast.daily_forecast:
+    day_date = datetime.datetime.fromtimestamp(day["dt"]).date()
+    if day_date == tomorrow:
+        temp_min = day["T"]["min"]
+        temp_max = day["T"]["max"]
+        description = day["weather12H"]["desc"]
+        icon_code = day["weather12H"]["icon"]
+        icon_url = f"https://meteofrance.com/modules/custom/mf_tools_common_theme/images/weather/{icon_code}.svg"
+        emoji = emoji_mapping.get(description, "❓")
+
+        # nouvelles données
+        precip_24h = day["precipitation"]["24h"]
+        sunrise = datetime.datetime.fromtimestamp(day["sun"]["rise"]).strftime("%H:%M")
+        sunset = datetime.datetime.fromtimestamp(day["sun"]["set"]).strftime("%H:%M")
+        uv = day.get("uv", "N/A")
+
+        st.markdown(f"📍 **{place.name} – {tomorrow.strftime('%A %d %B')}**")
+        st.markdown(f"{emoji} **{description}**")
+        st.markdown(f"🌡️ Température min : **{temp_min}°C**")
+        st.markdown(f"🌡️ Température max : **{temp_max}°C**")
+        st.markdown(f"💧 Précipitations (24h) : **{precip_24h} mm**")
+        st.markdown(f"☀️ Lever du soleil : **{sunrise}**")
+        st.markdown(f"🌇 Coucher du soleil : **{sunset}**")
+        st.markdown(f"🔆 Indice UV max : **{uv}**")
+        trouve = True
+        break
+
+if not trouve:
+    st.warning("Météo de demain indisponible.")
+
 st.title("🍇 Dashboard de la Plantation")
 
 inventaire = ouvrir_inventaire()
@@ -81,58 +144,3 @@ st.pyplot(fig)
 
 ecrire_inventaire(inventaire)
 ecrire_tresorerie(tresorerie)
-
-# 🔁 Mapping description météo → emoji
-emoji_mapping = {
-    "Ciel clair": "☀️",
-    "Peu nuageux": "🌤️",
-    "Ciel voilé": "🌥️",
-    "Nuageux": "☁️",
-    "Très nuageux": "☁️",
-    "Couvert": "☁️",
-    "Brume": "🌫️",
-    "Brouillard": "🌫️",
-    "Pluie faible": "🌦️",
-    "Pluie modérée": "🌧️",
-    "Pluie forte": "🌧️",
-    "Averses de pluie": "🌧️",
-    "Orages": "⛈️",
-    "Orage fort": "⛈️",
-    "Neige": "❄️",
-    "Averses de neige": "🌨️",
-    "Pluie et neige mêlées": "🌨️",
-    "Grêle": "🌩️",
-}
-
-# Client météo
-client = MeteoFranceClient()
-places = client.search_places("Blanquefort")
-place = places[0]
-forecast = client.get_forecast(place.latitude, place.longitude, language="fr")
-tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-
-# Recherche de la météo de demain
-# Recherche de la météo de demain
-st.header("🌤️ Météo de demain à Blanquefort")
-
-trouve = False
-for day in forecast.daily_forecast:
-    day_date = datetime.datetime.fromtimestamp(day["dt"]).date()
-    if day_date == tomorrow:
-        temp_min = day["T"]["min"]
-        temp_max = day["T"]["max"]
-        description = day["weather12H"]["desc"]
-        icon_code = day["weather12H"]["icon"]
-        icon_url = f"https://meteofrance.com/modules/custom/mf_tools_common_theme/images/weather/{icon_code}.svg"
-        emoji = emoji_mapping.get(description, "❓")
-
-        st.markdown(f"📍 **{place.name} – {tomorrow.strftime('%A %d %B')}**")
-        st.markdown(f"{emoji} **{description}**")
-        st.markdown(f"🌡️ Température min : **{temp_min}°C**")
-        st.markdown(f"🌡️ Température max : **{temp_max}°C**")
-        st.image(icon_url, width=80)
-        trouve = True
-        break
-
-if not trouve:
-    st.warning("Météo de demain indisponible.")
