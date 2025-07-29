@@ -5,7 +5,11 @@ from fruit_manager import *
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd
+import locale
 
+locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")  # Force le français
+aujourd_hui = datetime.date.today()
+date_aujourd_hui = aujourd_hui.strftime("%A %d %B %Y").capitalize()
 
 # 🔁 Mapping description météo → emoji
 emoji_mapping = {
@@ -31,13 +35,21 @@ emoji_mapping = {
 
 # Client météo
 client = MeteoFranceClient()
-places = client.search_places("Eysines")
+with st.sidebar:
+    st.markdown(f"📅 **{date_aujourd_hui}**")
+    ville = st.text_input("Entrez le nom d'une ville", value="Paris")
+
+if ville:
+    places = client.search_places(ville)
+else:
+    st.error("❌ Ville introuvable.")
 place = places[0]
 forecast = client.get_forecast(place.latitude, place.longitude, language="fr")
 tomorrow = datetime.date.today() + datetime.timedelta(days=1)
 
 # Recherche de la météo de demain
-st.title("🌤️ Météo de demain à Eysines")
+date_str = tomorrow.strftime("%d %B")
+st.title(f"🌤️ Météo à {ville} – {date_str}")
 
 trouve = False
 for day in forecast.daily_forecast:
@@ -47,7 +59,6 @@ for day in forecast.daily_forecast:
         temp_max = day["T"]["max"]
         description = day["weather12H"]["desc"]
         icon_code = day["weather12H"]["icon"]
-        icon_url = f"https://meteofrance.com/modules/custom/mf_tools_common_theme/images/weather/{icon_code}.svg"
         emoji = emoji_mapping.get(description, "❓")
 
         # nouvelles données
@@ -56,16 +67,19 @@ for day in forecast.daily_forecast:
         sunset = datetime.datetime.fromtimestamp(day["sun"]["set"]).strftime("%H:%M")
         uv = day.get("uv", "N/A")
 
-        st.markdown(f"📍 **{place.name} – {tomorrow.strftime('%A %d %B')}**")
-        st.markdown(f"{emoji} **{description}**")
-        st.markdown(f"🌡️ Température min : **{temp_min}°C**")
-        st.markdown(f"🌡️ Température max : **{temp_max}°C**")
-        st.markdown(f"💧 Précipitations (24h) : **{precip_24h} mm**")
-        st.markdown(f"☀️ Lever du soleil : **{sunrise}**")
-        st.markdown(f"🌇 Coucher du soleil : **{sunset}**")
-        st.markdown(f"🔆 Indice UV max : **{uv}**")
-        trouve = True
-        break
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown(f"☀️ Lever : **{sunrise}**")
+    st.markdown(f"🌃 Coucher : **{sunset}**")
+with col2:
+    st.markdown(f"❄️ Min : **{temp_min}°C**")
+    st.markdown(f"🔥️ Max : **{temp_max}°C**")
+with col3:
+    st.markdown(f"💧 Pluie (24h) : **{precip_24h} mm**")
+    st.markdown(f"🔆 UV max : **{uv}**")
+
+trouve = True
 
 if not trouve:
     st.warning("Météo de demain indisponible.")
