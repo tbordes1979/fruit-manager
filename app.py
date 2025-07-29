@@ -7,7 +7,7 @@ import matplotlib.dates as mdates
 import pandas as pd
 import locale
 
-locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")  # Force le français
+# locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")  # Force le français
 aujourd_hui = datetime.date.today()
 date_aujourd_hui = aujourd_hui.strftime("%A %d %B %Y").capitalize()
 
